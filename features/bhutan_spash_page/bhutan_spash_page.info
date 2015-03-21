@@ -1,0 +1,15 @@
+name = Bhutan Spash Page
+description = A content type for use as the Bhutan Oral Traditions Home Page
+core = 7.x
+package = Shanti
+version = 7.x-1.0-alpha
+project = bhutan_spash_page
+dependencies[] = features
+dependencies[] = text
+features[features_api][] = api:2
+features[field_base][] = field_grid_inset
+features[field_base][] = field_overview
+features[field_instance][] = node-splash_page-field_grid_inset
+features[field_instance][] = node-splash_page-field_overview
+features[node][] = splash_page
+project path = sites/all/modules/bhutan/features
