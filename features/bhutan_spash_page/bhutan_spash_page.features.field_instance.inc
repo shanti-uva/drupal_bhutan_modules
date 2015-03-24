@@ -22,7 +22,7 @@ function bhutan_spash_page_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 3,
       ),
     ),
     'entity_type' => 'field_collection_item',
@@ -40,7 +40,7 @@ function bhutan_spash_page_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -61,7 +61,7 @@ function bhutan_spash_page_field_default_field_instances() {
         'module' => 'link',
         'settings' => array(),
         'type' => 'link_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
     ),
     'entity_type' => 'field_collection_item',
@@ -96,7 +96,7 @@ function bhutan_spash_page_field_default_field_instances() {
       'module' => 'link',
       'settings' => array(),
       'type' => 'link_field',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -112,7 +112,7 @@ function bhutan_spash_page_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 1,
       ),
     ),
     'entity_type' => 'field_collection_item',
@@ -165,6 +165,44 @@ function bhutan_spash_page_field_default_field_instances() {
       ),
       'type' => 'text_textfield',
       'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'field_collection_item-field_collection_teaser-field_url'
+  $field_instances['field_collection_item-field_collection_teaser-field_url'] = array(
+    'bundle' => 'field_collection_teaser',
+    'default_value' => array(
+      0 => array(
+        'value' => 'home',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'The local page url that displays this resource',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
+    ),
+    'entity_type' => 'field_collection_item',
+    'field_name' => 'field_url',
+    'label' => 'URL',
+    'required' => 1,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
     ),
   );
 
@@ -309,7 +347,9 @@ function bhutan_spash_page_field_default_field_instances() {
   t('Overview Text');
   t('Overview text is in the box below the photo grid');
   t('The class of the icon in Shanticon list to use for this resource collection');
+  t('The local page url that displays this resource');
   t('Title');
+  t('URL');
 
   return $field_instances;
 }
