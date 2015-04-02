@@ -36,7 +36,9 @@ function bhutan_search_execute($search_term) {
 		$subjectsURL = "http://subjects.kmaps.virginia.edu/features/" . $id . "/related.json";
 		$subjects_fetch = save_to_cache('subjects', $app, $id, $subjectsURL);
 		$subjObj = json_decode($subjects_fetch);
-
+		$output = "<div><h5>Keyword Search on \"$search_term\"</h5><p>No Results Found. Try again!</p></div>";
+		$sb = drupal_get_form('search_block_form');
+		$output .= render($sb);
 		$setup = bhutan_search_setup_page($id, $app, $search_term);
 		if($setup['video_count'] > 0) {
 	    $avObj = $_SESSION['kmaps_explorer']['kmaps_explorer_audio_video'];
@@ -74,9 +76,8 @@ function bhutan_search_execute($search_term) {
     );
 
     $content = theme('kmaps_explorer_initial_template', $setup);
-//dpm($content, 'content');
 
-	  drupal_set_breadcrumb(array(l(t('Bhutan Cultural Library'), NULL), l(t('Search'), NULL), l($search_term, NULL)));
+	  //drupal_set_breadcrumb(array(l(t('Bhutan Cultural Library'), NULL), l(t('Search'), NULL), l($search_term, NULL)));
     return $content;
 }
 
