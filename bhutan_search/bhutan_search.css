@@ -10,3 +10,7 @@ aside li.places {
   display: none;
 }
 
+/* width of search box on no results page */
+.page-find .content-section .input-section {
+  max-width: 300px;
+}
