@@ -38,25 +38,35 @@ function bhutan_search_execute($search_term) {
 		$subjObj = json_decode($subjects_fetch);
 
 		$setup = bhutan_search_setup_page($id, $app, $search_term);
+		if($setup['video_count'] > 0) {
+	    $avObj = $_SESSION['kmaps_explorer']['kmaps_explorer_audio_video'];
+	
+	    $output = theme('kmaps_explorer_subjects_audio_video_ajax', array(
+	      'data' => $avObj->docs,
+	      'title' => 'Audio-Video with Keyword: "' . $search_term . '"',
+	      'app' => $app,
+	      'main_id' => $id,
+	    ));
+		} else if($setup['solr_text_count'] > 0) {
+			
+	    $solrObj = $_SESSION['kmaps_explorer']['kmaps_explorer_solr'];
+	
+	    foreach ($solrObj->grouped->asset_type->groups as $solrKey => $solrValue) {
+	      if ($solrValue->groupValue == "texts" && $solrValue->doclist->numFound == 1) {
+	        $output = '<iframe height="700" width="100%" frameBorder="0" src="' . $solrValue->doclist->docs[0]->url_ajax . '"></iframe>';
+	      } elseif($solrValue->groupValue == "texts" && $solrValue->doclist->numFound > 1) {
+	        $output = theme('kmaps_explorer_texts_summary', array(
+	          'data' => $solrValue,
+	          'sid' => $id,
+	          'app' => $app,
+	          'title' => 'Texts with Keyword "' . $search_term . '" in their Title',
+	        ));
+	      }
+	    }
+		}
 		
-    $avObj = $_SESSION['kmaps_explorer']['kmaps_explorer_audio_video'];
-
-    $output = theme('kmaps_explorer_subjects_audio_video_ajax', array(
-      'data' => $avObj->docs,
-      'title' => 'Audio-Video with Keyword: "' . $search_term . '"',
-      'app' => $app,
-      'main_id' => $id,
-    ));
+		// TODO: Need to add query for photos and concatenate
 		
-		/*
-    //Retrieve the title of the node
-    $title = isset($_SESSION['kmaps_explorer']['kmaps_explorer_node_title']) ? $_SESSION['kmaps_explorer']['kmaps_explorer_node_title'] : '';
-
-    $output = theme('kmaps_explorer_subjects_subjects_ajax', array(
-      'data' => $subjObj,
-      'title' => 'Subjects Related to ' . $title,
-    ));
-*/
     $setup += array(
       'active_content' => $output,
       'ajax' => $type == 'ajax' ? TRUE : FALSE,
@@ -65,6 +75,8 @@ function bhutan_search_execute($search_term) {
 
     $content = theme('kmaps_explorer_initial_template', $setup);
 //dpm($content, 'content');
+
+	  drupal_set_breadcrumb(array(l(t('Bhutan Cultural Library'), NULL), l(t('Search'), NULL), l($search_term, NULL)));
     return $content;
 }
 
