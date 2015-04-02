@@ -1,0 +1,172 @@
+<?php
+/**
+ * @file
+ * Code for the Bhutan Search.
+ */
+
+function bhutan_search_menu() {
+	$items = array(
+		'find/%' => array(
+	    'page callback' => 'bhutan_search_execute',
+	    'page arguments' => array(1),
+	    'access callback' => TRUE,
+	    
+	   ),
+	);
+	return $items;
+}
+function bhutan_search_form_search_block_form_alter(&$form, &$form_state, $form_id) {
+	//dpm($form, 'sb form ho2!');
+	$form['#submit'] = array('bhutan_search_form_submit');
+}
+
+function bhutan_search_form_submit($form, &$form_state) {
+	 if ($form_state['values']['search_block_form'] == '') {
+    form_set_error('keys', t('Please enter some keywords.'));
+  } else {
+  	$search_term = $form_state['values']['search_block_form'];
+		drupal_goto("find/$search_term");
+	}
+}
+
+function bhutan_search_execute($search_term) {
+		$id = '8260';
+		$app = 'subjects';
+		$type = 'page';
+		$subjectsURL = "http://subjects.kmaps.virginia.edu/features/" . $id . "/related.json";
+		$subjects_fetch = save_to_cache('subjects', $app, $id, $subjectsURL);
+		$subjObj = json_decode($subjects_fetch);
+
+		$setup = bhutan_search_setup_page($id, $app, $search_term);
+		
+    $avObj = $_SESSION['kmaps_explorer']['kmaps_explorer_audio_video'];
+
+    $output = theme('kmaps_explorer_subjects_audio_video_ajax', array(
+      'data' => $avObj->docs,
+      'title' => 'Audio-Video with Keyword: "' . $search_term . '"',
+      'app' => $app,
+      'main_id' => $id,
+    ));
+		
+		/*
+    //Retrieve the title of the node
+    $title = isset($_SESSION['kmaps_explorer']['kmaps_explorer_node_title']) ? $_SESSION['kmaps_explorer']['kmaps_explorer_node_title'] : '';
+
+    $output = theme('kmaps_explorer_subjects_subjects_ajax', array(
+      'data' => $subjObj,
+      'title' => 'Subjects Related to ' . $title,
+    ));
+*/
+    $setup += array(
+      'active_content' => $output,
+      'ajax' => $type == 'ajax' ? TRUE : FALSE,
+      'subject' => TRUE,
+    );
+
+    $content = theme('kmaps_explorer_initial_template', $setup);
+//dpm($content, 'content');
+    return $content;
+}
+
+
+/**
+ * Function to setup the page for first time loads and non ajax loads.
+ */
+function bhutan_search_setup_page($id, $app, $term) {
+  //css and js files to include in pages
+  $path = drupal_get_path('module', 'kmaps_explorer');
+  $mypath = drupal_get_path('module', 'bhutan_search');
+
+  //Store the type of the application(subjects or places)
+  $_SESSION['kmaps_explorer']['kmaps_explorer_app'] = $app;
+
+  $options = array(
+    'group' => CSS_THEME,
+  );
+
+  //drupal_add_css($path . '/css/bootstrap.min.css', $options);
+  //drupal_add_css($path . '/css/bootstrap-theme.min.css', $options);
+  drupal_add_css($path . '/css/kmaps_explorer.css', $options);
+
+  drupal_add_css($mypath . '/bhutan_search.css', $options);
+	
+  if ($app === 'places') {
+    drupal_add_css($path . '/css/places.css', $options);
+  }
+
+  //custom javascript
+  drupal_add_js($path . '/js/custom.js', $options);
+  drupal_add_js(array('kmaps_explorer' => array('app' => $app)), 'setting');
+
+  drupal_add_library('system', 'drupal.ajax');
+
+  //Create the url for related assets for subjects and places
+  $mURL = "http://" . $app . ".kmaps.virginia.edu/features/" . $id . ".json";
+
+  //Create the url for the solr related assets for subjects and places
+  //$solrURL = variable_get('shanti_kmaps_admin_server_solr', SHANTI_KMAPS_ADMIN_SERVER_SOLR) . '/select?q=kmapid:' . $app . '-' . $id . '&fq=&start=0&facets=on&group=true&group.field=asset_type&group.facet=true&group.ngroups=true&group.limit=1000&wt=json';
+
+	$base = variable_get('shanti_kmaps_admin_server_solr', SHANTI_KMAPS_ADMIN_SERVER_SOLR);
+	$solrURL = $base . '/select?q=caption:' . $term . '%20%20AND%20(kmapid:places-427%20OR%20kmapid:subjects-8260)&fq=&start=0&facets=on&group=true&group.field=asset_type&group.facet=true&group.ngroups=true&group.limit=1000&wt=json';
+		 
+  //Get related data and saving in cache
+  $c_name= 'json';
+  $related_url = save_to_cache($c_name, $app, $id, $mURL);
+  $obj = json_decode($related_url);
+
+  //Store the ancestors to be used for breadcrumbs
+  if($app == 'subjects') {
+    $_SESSION['kmaps_explorer']['kmaps_explorer_ancestors'] = $obj->feature->ancestors;
+  } elseif($app == 'places') {
+    $_SESSION['kmaps_explorer']['kmaps_explorer_ancestors'] = $obj->feature->perspectives[0]->ancestors;
+  }
+
+  //Set and Store the title of this node for other functions to use
+  $_SESSION['kmaps_explorer']['kmaps_explorer_node_title'] = $obj->feature->header;
+  drupal_set_title($obj->feature->header);
+
+  //Store the count for the places photos if available
+  if(isset($obj->feature->associated_resources->picture_count) && intval($obj->feature->associated_resources->picture_count) > 0) {
+    $_SESSION['kmaps_explorer']['kmaps_explorer_places_photos_count'] = $obj->feature->associated_resources->picture_count;
+  }
+
+  //Get solr data
+  //$c_name_solr = 'solrJSON';
+  //$related_solr = save_to_cache($c_name_solr, $app, $id, $solrURL);
+  $related_solr = file_get_contents($solrURL);
+  $solrObj = json_decode($related_solr);
+
+  //Store the solr object to be used in essays.
+  $_SESSION['kmaps_explorer']['kmaps_explorer_solr'] = $solrObj;
+
+  $video_count = 0;
+  $solr_text_count = 0;
+
+  foreach ($solrObj->grouped->asset_type->groups as $solrKey => $solrValue) {
+    if ($solrValue->groupValue == "audio-video" && $solrValue->doclist->numFound > 0) {
+      $video_count = $solrValue->doclist->numFound;
+      $_SESSION['kmaps_explorer']['kmaps_explorer_audio_video'] = $solrValue->doclist;
+    }
+    if ($solrValue->groupValue == "texts" && $solrValue->doclist->numFound > 0) {
+      $solr_text_count = $solrValue->doclist->numFound;
+    }
+  }
+
+  //test information for subpages
+  // $app = 'subject';
+  // $avURL = 'http://mediabase.drupal-dev.shanti.virginia.edu/services/' . $app . '/' . $id . '?rows=12&pg=3';
+  // $avObj = json_decode(file_get_contents($avURL));
+  // dpm($avObj);
+
+  return array(
+    'type' => $app,
+    'kid' => $id,
+    'obj' => $obj,
+    'reverse_type' => $app == 'subjects' ? 'places' : 'subjects',
+    'video_count' => $video_count,
+    'solr_text_count' => $solr_text_count,
+  );
+
+}
+// Basic Search: http://kidx.shanti.virginia.edu/solr/kmindex-dev/select?q=kmapid:places-427%20OR%20kmapid:subjects-8260&wt=json
+// http://kidx.shanti.virginia.edu/solr/kmindex-dev/select?q=caption:song%20%20AND%20(kmapid:places-427%20OR%20kmapid:subjects-8260)&fq=&start=0&facets=on&group=true&group.field=asset_type&group.facet=true&group.ngroups=true&group.limit=1000&wt=json
