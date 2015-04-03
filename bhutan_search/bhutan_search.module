@@ -25,11 +25,13 @@ function bhutan_search_form_submit($form, &$form_state) {
     form_set_error('keys', t('Please enter some keywords.'));
   } else {
   	$search_term = $form_state['values']['search_block_form'];
-		drupal_goto("find/$search_term");
+		drupal_goto("find/$search_term	");
 	}
 }
 
 function bhutan_search_execute($search_term) {
+		$search_term = trim($search_term);
+		$search_term = "\"$search_term\"";
 		$id = '8260';
 		$app = 'subjects';
 		$type = 'page';
@@ -40,31 +42,33 @@ function bhutan_search_execute($search_term) {
 		$sb = drupal_get_form('search_block_form');
 		$output .= render($sb);
 		$setup = bhutan_search_setup_page($id, $app, $search_term);
-		if($setup['video_count'] > 0) {
-	    $avObj = $_SESSION['kmaps_explorer']['kmaps_explorer_audio_video'];
-	
-	    $output = theme('kmaps_explorer_subjects_audio_video_ajax', array(
-	      'data' => $avObj->docs,
-	      'title' => 'Audio-Video with Keyword: "' . $search_term . '"',
-	      'app' => $app,
-	      'main_id' => $id,
-	    ));
-		} else if($setup['solr_text_count'] > 0) {
-			
-	    $solrObj = $_SESSION['kmaps_explorer']['kmaps_explorer_solr'];
-	
-	    foreach ($solrObj->grouped->asset_type->groups as $solrKey => $solrValue) {
-	      if ($solrValue->groupValue == "texts" && $solrValue->doclist->numFound == 1) {
-	        $output = '<iframe height="700" width="100%" frameBorder="0" src="' . $solrValue->doclist->docs[0]->url_ajax . '"></iframe>';
-	      } elseif($solrValue->groupValue == "texts" && $solrValue->doclist->numFound > 1) {
-	        $output = theme('kmaps_explorer_texts_summary', array(
-	          'data' => $solrValue,
-	          'sid' => $id,
-	          'app' => $app,
-	          'title' => 'Texts with Keyword "' . $search_term . '" in their Title',
-	        ));
-	      }
-	    }
+		if($setup) { 
+			if($setup['video_count'] > 0) {
+		    $avObj = $_SESSION['kmaps_explorer']['kmaps_explorer_audio_video'];
+		
+		    $output = theme('kmaps_explorer_subjects_audio_video_ajax', array(
+		      'data' => $avObj->docs,
+		      'title' => 'Audio-Video with Keyword: "' . $search_term . '"',
+		      'app' => $app,
+		      'main_id' => $id,
+		    ));
+			} else if($setup['solr_text_count'] > 0) {
+				
+		    $solrObj = $_SESSION['kmaps_explorer']['kmaps_explorer_solr'];
+		
+		    foreach ($solrObj->grouped->asset_type->groups as $solrKey => $solrValue) {
+		      if ($solrValue->groupValue == "texts" && $solrValue->doclist->numFound == 1) {
+		        $output = '<iframe height="700" width="100%" frameBorder="0" src="' . $solrValue->doclist->docs[0]->url_ajax . '"></iframe>';
+		      } elseif($solrValue->groupValue == "texts" && $solrValue->doclist->numFound > 1) {
+		        $output = theme('kmaps_explorer_texts_summary', array(
+		          'data' => $solrValue,
+		          'sid' => $id,
+		          'app' => $app,
+		          'title' => 'Texts with Keyword "' . $search_term . '" in their Title',
+		        ));
+		      }
+		    }
+			}
 		}
 		
 		// TODO: Need to add query for photos and concatenate
@@ -120,7 +124,7 @@ function bhutan_search_setup_page($id, $app, $term) {
   //$solrURL = variable_get('shanti_kmaps_admin_server_solr', SHANTI_KMAPS_ADMIN_SERVER_SOLR) . '/select?q=kmapid:' . $app . '-' . $id . '&fq=&start=0&facets=on&group=true&group.field=asset_type&group.facet=true&group.ngroups=true&group.limit=1000&wt=json';
 
 	$base = variable_get('shanti_kmaps_admin_server_solr', SHANTI_KMAPS_ADMIN_SERVER_SOLR);
-	$solrURL = $base . '/select?q=caption:' . $term . '%20%20AND%20(kmapid:places-427%20OR%20kmapid:subjects-8260)&fq=&start=0&facets=on&group=true&group.field=asset_type&group.facet=true&group.ngroups=true&group.limit=1000&wt=json';
+	$solrURL = $base . '/select?q=caption:' . $term . '%20AND%20(kmapid:places-427%20OR%20kmapid:subjects-8260)&fq=&start=0&facets=on&group=true&group.field=asset_type&group.facet=true&group.ngroups=true&group.limit=1000&wt=json';
 		 
   //Get related data and saving in cache
   $c_name= 'json';
@@ -154,32 +158,34 @@ function bhutan_search_setup_page($id, $app, $term) {
 
   $video_count = 0;
   $solr_text_count = 0;
-
-  foreach ($solrObj->grouped->asset_type->groups as $solrKey => $solrValue) {
-    if ($solrValue->groupValue == "audio-video" && $solrValue->doclist->numFound > 0) {
-      $video_count = $solrValue->doclist->numFound;
-      $_SESSION['kmaps_explorer']['kmaps_explorer_audio_video'] = $solrValue->doclist;
-    }
-    if ($solrValue->groupValue == "texts" && $solrValue->doclist->numFound > 0) {
-      $solr_text_count = $solrValue->doclist->numFound;
-    }
-  }
-
-  //test information for subpages
-  // $app = 'subject';
-  // $avURL = 'http://mediabase.drupal-dev.shanti.virginia.edu/services/' . $app . '/' . $id . '?rows=12&pg=3';
-  // $avObj = json_decode(file_get_contents($avURL));
-  // dpm($avObj);
-
-  return array(
-    'type' => $app,
-    'kid' => $id,
-    'obj' => $obj,
-    'reverse_type' => $app == 'subjects' ? 'places' : 'subjects',
-    'video_count' => $video_count,
-    'solr_text_count' => $solr_text_count,
-  );
-
+	try { 
+	  foreach ($solrObj->grouped->asset_type->groups as $solrKey => $solrValue) {
+	    if ($solrValue->groupValue == "audio-video" && $solrValue->doclist->numFound > 0) {
+	      $video_count = $solrValue->doclist->numFound;
+	      $_SESSION['kmaps_explorer']['kmaps_explorer_audio_video'] = $solrValue->doclist;
+	    }
+	    if ($solrValue->groupValue == "texts" && $solrValue->doclist->numFound > 0) {
+	      $solr_text_count = $solrValue->doclist->numFound;
+	    }
+	  }
+	
+	  //test information for subpages
+	  // $app = 'subject';
+	  // $avURL = 'http://mediabase.drupal-dev.shanti.virginia.edu/services/' . $app . '/' . $id . '?rows=12&pg=3';
+	  // $avObj = json_decode(file_get_contents($avURL));
+	  // dpm($avObj);
+	
+	  return array(
+	    'type' => $app,
+	    'kid' => $id,
+	    'obj' => $obj,
+	    'reverse_type' => $app == 'subjects' ? 'places' : 'subjects',
+	    'video_count' => $video_count,
+	    'solr_text_count' => $solr_text_count,
+	  );
+	} catch(Exception $e) {
+		return FALSE;
+	}
 }
 // Basic Search: http://kidx.shanti.virginia.edu/solr/kmindex-dev/select?q=kmapid:places-427%20OR%20kmapid:subjects-8260&wt=json
 // http://kidx.shanti.virginia.edu/solr/kmindex-dev/select?q=caption:song%20%20AND%20(kmapid:places-427%20OR%20kmapid:subjects-8260)&fq=&start=0&facets=on&group=true&group.field=asset_type&group.facet=true&group.ngroups=true&group.limit=1000&wt=json
