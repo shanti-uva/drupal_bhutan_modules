@@ -25,7 +25,7 @@ function bhutan_search_form_submit($form, &$form_state) {
     form_set_error('keys', t('Please enter some keywords.'));
   } else {
   	$search_term = $form_state['values']['search_block_form'];
-		drupal_goto("find/$search_term	");
+		drupal_goto("find/$search_term");
 	}
 }
 
