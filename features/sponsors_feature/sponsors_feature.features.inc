@@ -12,6 +12,31 @@ function sponsors_feature_views_api($module = NULL, $api = NULL) {
 }
 
 /**
+ * Implements hook_image_default_styles().
+ */
+function sponsors_feature_image_default_styles() {
+  $styles = array();
+
+  // Exported image style: sponsor_logo.
+  $styles['sponsor_logo'] = array(
+    'label' => 'Sponsor Logo',
+    'effects' => array(
+      2 => array(
+        'name' => 'image_scale',
+        'data' => array(
+          'width' => 220,
+          'height' => '',
+          'upscale' => 1,
+        ),
+        'weight' => 2,
+      ),
+    ),
+  );
+
+  return $styles;
+}
+
+/**
  * Implements hook_node_info().
  */
 function sponsors_feature_node_info() {

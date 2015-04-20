@@ -114,6 +114,8 @@ function sponsors_feature_views_default_views() {
 
   /* Display: Sponsor List Page */
   $handler = $view->new_display('page', 'Sponsor List Page', 'sponsor_list');
+  $handler->display->display_options['defaults']['title'] = FALSE;
+  $handler->display->display_options['title'] = 'Sponsors of the Bhutan Cultural Library';
   $handler->display->display_options['defaults']['css_class'] = FALSE;
   $handler->display->display_options['css_class'] = 'sponsor-list';
   $handler->display->display_options['display_description'] = 'List of all sponsors';
