@@ -134,6 +134,14 @@ function sponsors_feature_views_default_views() {
   $handler->display->display_options['fields']['field_url']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_url']['hide_empty'] = TRUE;
   $handler->display->display_options['fields']['field_url']['type'] = 'text_plain';
+  /* Field: Field: URL */
+  $handler->display->display_options['fields']['field_url_1']['id'] = 'field_url_1';
+  $handler->display->display_options['fields']['field_url_1']['table'] = 'field_data_field_url';
+  $handler->display->display_options['fields']['field_url_1']['field'] = 'field_url';
+  $handler->display->display_options['fields']['field_url_1']['label'] = '';
+  $handler->display->display_options['fields']['field_url_1']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['field_url_1']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_url_1']['type'] = 'text_plain';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -165,7 +173,8 @@ function sponsors_feature_views_default_views() {
   $handler->display->display_options['fields']['field_logo']['table'] = 'field_data_field_logo';
   $handler->display->display_options['fields']['field_logo']['field'] = 'field_logo';
   $handler->display->display_options['fields']['field_logo']['label'] = '';
-  $handler->display->display_options['fields']['field_logo']['alter']['text'] = '<a href="[field_url]" target="_blank"  title="[title]>[field_logo]</a>';
+  $handler->display->display_options['fields']['field_logo']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['field_logo']['alter']['text'] = '<a href="[field_url_1]" target="_blank"  title="Visit [title]">[field_logo]</a>';
   $handler->display->display_options['fields']['field_logo']['element_type'] = 'div';
   $handler->display->display_options['fields']['field_logo']['element_class'] = 'logo';
   $handler->display->display_options['fields']['field_logo']['element_label_colon'] = FALSE;
