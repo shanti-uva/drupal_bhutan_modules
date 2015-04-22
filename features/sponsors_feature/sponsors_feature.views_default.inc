@@ -126,15 +126,19 @@ function sponsors_feature_views_default_views() {
   $handler->display->display_options['fields']['field_url']['field'] = 'field_url';
   $handler->display->display_options['fields']['field_url']['label'] = '';
   $handler->display->display_options['fields']['field_url']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['field_url']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['field_url']['alter']['text'] = 'For more information please visit <a href="[field_url]" target="_blank">[field_url]</a>.';
+  $handler->display->display_options['fields']['field_url']['element_type'] = '0';
   $handler->display->display_options['fields']['field_url']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_url']['empty'] = '[field_logo]';
-  $handler->display->display_options['fields']['field_url']['hide_alter_empty'] = FALSE;
+  $handler->display->display_options['fields']['field_url']['element_wrapper_type'] = '0';
+  $handler->display->display_options['fields']['field_url']['element_default_classes'] = FALSE;
+  $handler->display->display_options['fields']['field_url']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_url']['type'] = 'text_plain';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['label'] = '';
-  $handler->display->display_options['fields']['title']['alter']['alter_text'] = TRUE;
   $handler->display->display_options['fields']['title']['alter']['text'] = '<a href="[field_url]" target="_blank">[title]</a>';
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
@@ -146,13 +150,13 @@ function sponsors_feature_views_default_views() {
   $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
   $handler->display->display_options['fields']['body']['field'] = 'body';
   $handler->display->display_options['fields']['body']['label'] = '';
-  $handler->display->display_options['fields']['body']['alter']['text'] = '[body]';
-  $handler->display->display_options['fields']['body']['element_type'] = 'div';
-  $handler->display->display_options['fields']['body']['element_class'] = 'summary';
+  $handler->display->display_options['fields']['body']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['body']['alter']['text'] = '<div class="summary">[body]  [field_url]</div>';
+  $handler->display->display_options['fields']['body']['element_type'] = '0';
   $handler->display->display_options['fields']['body']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['body']['element_wrapper_type'] = '0';
   $handler->display->display_options['fields']['body']['element_default_classes'] = FALSE;
-  $handler->display->display_options['fields']['body']['type'] = 'text_summary_or_trimmed';
+  $handler->display->display_options['fields']['body']['type'] = 'text_plain';
   $handler->display->display_options['fields']['body']['settings'] = array(
     'trim_length' => '600',
   );
@@ -161,7 +165,6 @@ function sponsors_feature_views_default_views() {
   $handler->display->display_options['fields']['field_logo']['table'] = 'field_data_field_logo';
   $handler->display->display_options['fields']['field_logo']['field'] = 'field_logo';
   $handler->display->display_options['fields']['field_logo']['label'] = '';
-  $handler->display->display_options['fields']['field_logo']['alter']['alter_text'] = TRUE;
   $handler->display->display_options['fields']['field_logo']['alter']['text'] = '<a href="[field_url]" target="_blank"  title="[title]>[field_logo]</a>';
   $handler->display->display_options['fields']['field_logo']['element_type'] = 'div';
   $handler->display->display_options['fields']['field_logo']['element_class'] = 'logo';
@@ -173,20 +176,6 @@ function sponsors_feature_views_default_views() {
     'image_style' => 'sponsor_logo',
     'image_link' => '',
   );
-  /* Field: Field: URL */
-  $handler->display->display_options['fields']['field_url_1']['id'] = 'field_url_1';
-  $handler->display->display_options['fields']['field_url_1']['table'] = 'field_data_field_url';
-  $handler->display->display_options['fields']['field_url_1']['field'] = 'field_url';
-  $handler->display->display_options['fields']['field_url_1']['label'] = 'Website';
-  $handler->display->display_options['fields']['field_url_1']['alter']['alter_text'] = TRUE;
-  $handler->display->display_options['fields']['field_url_1']['alter']['text'] = ' <a href="[field_url]" target="_blank">[field_url]</a>';
-  $handler->display->display_options['fields']['field_url_1']['element_type'] = 'span';
-  $handler->display->display_options['fields']['field_url_1']['element_class'] = 'url';
-  $handler->display->display_options['fields']['field_url_1']['element_label_type'] = 'span';
-  $handler->display->display_options['fields']['field_url_1']['element_label_class'] = 'label';
-  $handler->display->display_options['fields']['field_url_1']['element_wrapper_type'] = 'div';
-  $handler->display->display_options['fields']['field_url_1']['element_wrapper_class'] = 'website';
-  $handler->display->display_options['fields']['field_url_1']['element_default_classes'] = FALSE;
   $handler->display->display_options['path'] = 'sponsors';
   $export['sponsor_logos'] = $view;
 
