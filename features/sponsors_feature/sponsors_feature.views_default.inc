@@ -51,7 +51,7 @@ function sponsors_feature_views_default_views() {
   $handler->display->display_options['fields']['field_logo']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_logo']['click_sort_column'] = 'fid';
   $handler->display->display_options['fields']['field_logo']['settings'] = array(
-    'image_style' => 'medium',
+    'image_style' => 'sponsor_logo',
     'image_link' => '',
   );
   /* Field: Field: URL */
@@ -182,7 +182,7 @@ function sponsors_feature_views_default_views() {
   $handler->display->display_options['fields']['field_logo']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_logo']['click_sort_column'] = 'fid';
   $handler->display->display_options['fields']['field_logo']['settings'] = array(
-    'image_style' => 'sponsor_logo',
+    'image_style' => 'medium',
     'image_link' => '',
   );
   $handler->display->display_options['path'] = 'sponsors';

@@ -20,17 +20,7 @@ function sponsors_feature_image_default_styles() {
   // Exported image style: sponsor_logo.
   $styles['sponsor_logo'] = array(
     'label' => 'Sponsor Logo',
-    'effects' => array(
-      2 => array(
-        'name' => 'image_scale',
-        'data' => array(
-          'width' => 220,
-          'height' => '',
-          'upscale' => 1,
-        ),
-        'weight' => 2,
-      ),
-    ),
+    'effects' => array(),
   );
 
   return $styles;
